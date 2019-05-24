@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="722c89a6-4f87-4016-9477-608b6a433d7c" >
+		<http:listener-connection host="0.0.0.0" port="80" />
+	</http:listener-config>
+	<flow name="jsonarray_funcFlow" doc:id="e5cb6d18-4923-4660-98f0-86128712e199" >
+		<http:listener doc:name="Listener" doc:id="971983a8-049a-439b-968b-a31c0f795822" config-ref="HTTP_Listener_config" path="/query_p/{add_1}"/>
+		<set-variable value="#[attributes.uriParams['add_1']]" doc:name="Set Variable" doc:id="735359fe-bd92-49db-8124-3cbd807341d2" variableName="uri_variable"/>
+		<logger level="INFO" doc:name="Logger" doc:id="9166a602-d88e-4c01-831c-6fdab7a56c7e" message="#[vars.uri_variable]"/>
+		<set-variable value="#[attributes.queryParams['a']]" doc:name="Set Variable" doc:id="89b5bd83-a01f-44ed-9507-2839285ba17e" variableName="A"/>
+		<set-variable value="#[attributes.queryParams['b']]" doc:name="Set Variable" doc:id="607699c8-7af7-40ba-a2f1-6b2931dc979b" variableName="B"/>
+		<set-variable value="#[attributes.queryParams['c']]" doc:name="Set Variable" doc:id="66da33a3-64b5-4960-b2ea-8e5c20b602dc" variableName="C"/>
+		<logger level="INFO" doc:name="Logger" doc:id="947d1f33-999a-418d-8d07-842517e18c16" message="#[vars.A]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="7ec7a8a4-6213-47c6-8df2-f140d5288e6f" message="#[vars.B]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="9f38ffcc-1018-4d85-b23e-6e426e76ab18" message="#[vars.C]"/>
+		<ee:transform doc:name="Transform Message" doc:id="a75ab752-c88c-41c8-a03e-c75b2378df9a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+(vars.A as Number default "") + (vars.B as Number default "")+(vars.C as Number default "")]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="1ed1f680-9074-4e50-8d11-85618b3d9c4c" message="#[payload]"/>
+	</flow>
+	<flow name="jsonarray_funcFlow1" doc:id="29e70b92-1c0a-4be5-a51e-bc8a92c9aace" >
+		<http:listener doc:name="Listener" doc:id="32409b0f-013e-44b0-bc34-2700ec619306" config-ref="HTTP_Listener_config" path="/hello/{hai}"/>
+		<set-variable value="#[attributes.uriParams['hai']]" doc:name="Set Variable" doc:id="e72c4908-fd08-4c2f-9714-edfccb2a2fcc" variableName="uriparam"/>
+		<logger level="INFO" doc:name="Logger" doc:id="41451445-8e56-4a11-8d22-605cea7c0ce0" message="#[vars.uriparam]"/>
+		<set-variable value="#[attributes.queryParams['a']]" doc:name="Set Variable" doc:id="b49324b6-9003-4484-bd0a-89b7acb9fd77" variableName="A"/>
+		<logger level="INFO" doc:name="Logger" doc:id="31ac53bf-dbaa-4efb-9c76-1837128dc3e6" message="#[vars.A]"/>
+		<set-variable value="#[attributes.queryParams['b']]" doc:name="Set Variable" doc:id="b20b19af-5e20-403d-9c48-500f421e0a77" variableName="B"/>
+		<logger level="INFO" doc:name="Logger" doc:id="b0d7b7fe-9c8f-4c58-a0dd-2dc267779113" message="#[vars.B]"/>
+		<ee:transform doc:name="Transform Message" doc:id="a94b86f8-7442-4b52-884c-2fd869c46a47" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+A_value:vars.A as Number default ""]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="jsonarray_funcFlow2" doc:id="9b424ed0-9471-4d3f-a14d-c31f4a23f955" >
+		<http:listener doc:name="Listener" doc:id="35223d2e-caf8-4deb-8d29-db3904e0801c" config-ref="HTTP_Listener_config" path="/example"/>
+		<ee:transform doc:name="Transform Message" doc:id="779235ba-b669-4c5c-86f4-a41ea816a0a2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+fun getName(data) = log(data pluck $)
+---
+{
+	"getId" : getName(payload)
+}	
+	
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="4901f52e-dfbb-4dde-907a-74f5d0d60588" message="#[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="962c44ba-a187-4e16-9843-46b887ebb6bf">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+ payload.getId map (item, index) -> {
+      res:item mapObject (value, key) -> {
+      value: value
+      }
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="jsonarray_funcFlow3" doc:id="c3237ef1-9fe2-4b4c-9a28-414945143939" >
+		<http:listener doc:name="Listener" doc:id="26b2f57d-8091-4ec7-9acd-ef62db01e67f" config-ref="HTTP_Listener_config" path="/example1"/>
+		<ee:transform doc:name="Transform Message" doc:id="956b429b-9408-4f8e-ad57-304f578f6c75" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	res:"hi you r called!!!!!"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
